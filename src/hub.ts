@@ -9,7 +9,6 @@
  * After each edition:
  *   1. move the finished edition from `upcoming` into `past`
  *   2. set `upcoming` to the next edition (or `null` while the host is unknown)
- *   3. update `callForHosts` for the following year
  * -------------------------------------------------------------------------- */
 
 export interface Edition {
@@ -53,18 +52,6 @@ export const hub = {
       note: 'The first SAIMI edition',
     },
   ] as Edition[],
-
-  /**
-   * Call for hosts. `open: false` hides the section and its menu item while
-   * keeping the text ready for when you want to run the call.
-   */
-  callForHosts: {
-    open: false,
-    /** The edition being sought. */
-    year: 2028,
-    text:
-      'SAIMI moves between Swiss institutions. We are looking for a host for <strong>SAIMI 2028</strong> and would like to hear from any Swiss university, hospital or research institute interested in running an edition.<br /><br />A proposal is short — a page is plenty — and should cover the proposed venue and approximate date, who would be on the local organising team, and a rough budget. The steering committee provides an organiser handbook with the timeline, review setup and sponsor contacts from previous years, and at least one organiser from the previous edition stays involved to pass on practical knowledge.<br /><br />We aim to decide 12 to 18 months ahead, and to announce the next host at the closing session of the preceding edition.',
-  },
 
   steeringCommittee: [
     {

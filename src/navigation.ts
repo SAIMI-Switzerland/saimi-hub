@@ -15,9 +15,6 @@ export const headerData = {
   links: [
     { text: 'About', href: getPermalink('/#about') },
     { text: 'Editions', links: editionLinks },
-    ...(hub.callForHosts.open
-      ? [{ text: `Host SAIMI ${hub.callForHosts.year}`, href: getPermalink('/#hosts') }]
-      : []),
     { text: 'Sponsoring', href: getPermalink('/#sponsoring') },
     { text: 'Steering Committee', href: getPermalink('/#sc') },
     { text: 'Code of Conduct', href: getPermalink('/code-of-conduct') },

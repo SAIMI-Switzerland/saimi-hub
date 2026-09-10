@@ -11,7 +11,7 @@ Live at **https://saimi.ch** *(not deployed yet — see below)*
 |---|---|---|
 | Owner | Steering committee | That year's organising committee |
 | Lifetime | Permanent, kept current | Frozen once the event is over |
-| Content | Mission, steering committee, editions index, call for hosts, sponsoring info, code of conduct, contact | Programme, dates, call for abstracts, registration, venue, keynotes, local team, that year's sponsors |
+| Content | Mission, steering committee, editions index, sponsoring info, code of conduct, contact | Programme, dates, call for abstracts, registration, venue, keynotes, local team, that year's sponsors |
 
 Related repositories:
 
@@ -27,7 +27,8 @@ Nearly everything is in **`src/hub.ts`**.
 
 1. Move the finished edition object from `upcoming` into the top of `past`.
 2. Set `upcoming` to the next edition, or `null` if no host is confirmed yet.
-3. Update `callForHosts` (`year`, `open`, and the text) for the following edition.
+Hosts for future editions are approached internally by the steering committee, so
+the hub carries no public call for hosts.
 
 **Other things you may need to change:**
 

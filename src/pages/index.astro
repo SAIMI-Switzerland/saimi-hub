@@ -95,18 +95,6 @@ const contactText = hub.contactEmail
     ]}
   />
 
-  {
-    hub.callForHosts.open && (
-      <Content2
-        title={`Call for hosts — SAIMI ${hub.callForHosts.year}`}
-        id="hosts"
-        sections={[{ subtitle: '', text: hub.callForHosts.text }]}
-      >
-        <Fragment slot="bg" set:html={blueBg} />
-      </Content2>
-    )
-  }
-
   <Content2
     title="Sponsoring"
     id="sponsoring"
