@@ -1,0 +1,74 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+
+const {
+  title = await Astro.slots.render('title'),
+  sections = [], // { id?, subtitle, text?, bullets? }
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+// Slug helper (fallback only)
+const slugify = (str = '') =>
+  str
+    .toLowerCase()
+    .trim()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-');
+---
+<WidgetWrapper
+  id={id}
+  isDark={isDark}
+  containerClass={`max-w-5xl mx-auto ${classes?.container ?? ''}`}
+  bg={bg}
+>
+  <!-- Main Headline -->
+  <Headline
+    title={title}
+    classes={{
+      container: 'text-center mb-12',
+      title: 'text-4xl md:text-5xl font-bold tracking-tighter font-heading',
+    }}
+  />
+
+  <!-- Sections -->
+  <div class="space-y-10 max-w-3xl mx-auto text-center">
+    {sections.map((section) => {
+      const sectionId = section.id
+        ? `${id}-${section.id}`
+        : `${id}-${slugify(section.subtitle)}`;
+
+      return (
+        <div
+          id={sectionId}
+          class="md:text-center scroll-mt-24"
+        >
+          <h3 class="text-2xl font-semibold dark:text-white mb-2">
+            {section.subtitle}
+          </h3>
+
+          {section.text && (
+            <p
+              class="text-lg text-muted dark:text-slate-400 mb-2"
+              set:html={section.text}
+            />
+          )}
+
+          {section.bullets && section.bullets.length > 0 && (
+            <div class="text-left inline-block mx-auto">
+              <ul class="list-disc list-inside text-lg text-muted dark:text-slate-400 space-y-1">
+                {section.bullets.map((bullet, i) => (
+                  <li key={i}>{bullet}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</WidgetWrapper>

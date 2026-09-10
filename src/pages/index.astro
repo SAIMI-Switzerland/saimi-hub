@@ -1,0 +1,132 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+
+import Hero from '~/components/widgets/Hero.astro';
+import Content2 from '~/components/widgets/Content2.astro';
+import Content4 from '~/components/widgets/Content4.astro';
+import Content6 from '~/components/widgets/Content6.astro';
+import EditionCards from '~/components/widgets/EditionCards.astro';
+
+import logoMICCAI from '~/assets/images/MICCAI-Logo.svg';
+import { hub } from '~/hub';
+
+const metadata = {
+  title: 'SAIMI — Symposium on Artificial Intelligence in Medical Imaging',
+  ignoreTitleTemplate: true,
+};
+
+const personIcon = '~/assets/images/person_icon.png';
+const blueBg = '<div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>';
+
+const heroActions = [
+  ...(hub.upcoming?.url
+    ? [
+        {
+          variant: 'primary',
+          text: `SAIMI ${hub.upcoming.year} in ${hub.upcoming.city}`,
+          href: hub.upcoming.url,
+          icon: 'tabler:arrow-right',
+        },
+      ]
+    : []),
+  { text: 'Contact', href: '/#contact' },
+];
+
+const contactText = hub.contactEmail
+  ? hub.contactEmail
+  : 'A general contact address for SAIMI is being set up. In the meantime, please reach out to a member of the steering committee, or via LinkedIn.';
+---
+
+<Layout metadata={metadata}>
+  <Hero actions={heroActions} image={{ src: '~/assets/images/medicalimages.jpg', alt: 'Medical images' }}>
+    <Fragment slot="title">
+      Symposium on Artificial Intelligence in Medical Imaging
+      <span class="text-accent dark:text-white"> SAIMI</span>
+    </Fragment>
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        A one-day symposium for the Swiss medical image analysis community, endorsed by MICCAI
+        and hosted by a different Swiss institution each year.
+        {
+          hub.upcoming && (
+            <Fragment>
+              <br />
+              <br />
+              <span class="font-semibold">
+                Next: SAIMI {hub.upcoming.year} — {hub.upcoming.date} in {hub.upcoming.city}
+              </span>
+            </Fragment>
+          )
+        }
+      </span>
+    </Fragment>
+  </Hero>
+
+  {
+    hub.upcoming && (
+      <EditionCards title="Upcoming edition" id="upcoming" featured editions={[hub.upcoming]} />
+    )
+  }
+
+  {
+    hub.past.length > 0 && (
+      <EditionCards
+        title="Past editions"
+        subtitle="Each edition keeps its own site. Past editions are archived and no longer updated."
+        id="past"
+        editions={hub.past}
+        bg={blueBg}
+      />
+    )
+  }
+
+  <Content2
+    title='About <span class="text-accent dark:text-white"> SAIMI</span>'
+    id="about"
+    sections={[
+      {
+        subtitle: 'Mission',
+        text: 'SAIMI brings together the research groups across Switzerland working on artificial intelligence for medical imaging. The aim is a low-threshold, one-day meeting where people present recent advances, exchange ideas, and discuss both institution-specific and field-wide challenges — from transparency, interpretability and model reliability to the heterogeneity of image acquisition across hospitals, and what stands between a promising method and clinical use.<br /><br />Early-career researchers and students are explicitly encouraged to present their work, and the program is complemented by keynotes from experienced researchers and by representatives from industry and clinical practice.',
+      },
+      {
+        subtitle: 'How SAIMI works',
+        text: 'SAIMI is deliberately lightweight. A permanent <strong>steering committee</strong> holds continuity: it maintains this site, selects hosts, and hands on an organiser handbook. Each edition is run by a <strong>local organising committee</strong> at the hosting institution, which owns its own programme, budget and website. At least one organiser carries over between consecutive editions so practical knowledge is not lost.<br /><br />The symposium is non-archival, attendance is free, and abstracts are reviewed double-blind. SAIMI is endorsed by the MICCAI Society.',
+      },
+    ]}
+  />
+
+  {
+    hub.callForHosts.open && (
+      <Content2
+        title={`Call for hosts — SAIMI ${hub.callForHosts.year}`}
+        id="hosts"
+        sections={[{ subtitle: '', text: hub.callForHosts.text }]}
+      >
+        <Fragment slot="bg" set:html={blueBg} />
+      </Content2>
+    )
+  }
+
+  <Content2
+    title="Sponsoring"
+    id="sponsoring"
+    sections={[
+      {
+        subtitle: '',
+        text: 'SAIMI is free to attend, which is only possible because of our sponsors. Sponsorship is arranged per edition by that year’s organising committee, and typically includes visibility on the edition website and programme, and a booth during the poster sessions.<br /><br />If your company would like to support an upcoming edition, please get in touch — we are happy to put you in contact with the current organising team.',
+      },
+    ]}
+  />
+
+  <Content4 title="Steering Committee" id="sc" sections={hub.steeringCommittee.map((p) => ({ ...p, image: { src: p.image ?? personIcon, alt: p.name } }))}>
+    <Fragment slot="bg" set:html={blueBg} />
+  </Content4>
+
+  <Content2 title="Contact" id="contact" sections={[{ subtitle: 'Questions about SAIMI?', text: contactText }]} />
+
+  <Content6
+    title=""
+    id="endorsement"
+    sections={[{ subtitle: 'Endorsed by', size: 'sm', images: [{ src: logoMICCAI, alt: 'MICCAI' }] }]}
+  />
+</Layout>

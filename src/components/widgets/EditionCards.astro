@@ -1,0 +1,68 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  id?: string;
+  editions?: {
+    year: number;
+    date: string;
+    venue: string;
+    city: string;
+    url: string | null;
+    note?: string;
+  }[];
+  /** Renders the single upcoming edition larger. */
+  featured?: boolean;
+  bg?: unknown;
+}
+
+const { title = '', subtitle = '', id, editions = [], featured = false, bg } = Astro.props;
+---
+
+<WidgetWrapper id={id} containerClass="max-w-5xl mx-auto" bg={bg}>
+  <Headline
+    title={title}
+    subtitle={subtitle}
+    classes={{
+      container: 'text-center mb-10',
+      title: 'text-4xl md:text-5xl font-bold tracking-tighter font-heading',
+    }}
+  />
+  <div class:list={['grid gap-6', featured ? 'grid-cols-1' : 'sm:grid-cols-2']}>
+    {
+      editions.map((e) => {
+        const Tag = e.url ? 'a' : 'div';
+        return (
+          <Tag
+            {...(e.url ? { href: e.url } : {})}
+            class:list={[
+              'block rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 transition',
+              e.url ? 'hover:shadow-md hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary' : '',
+              featured ? 'md:p-8' : '',
+            ]}
+          >
+            <div class:list={['font-bold font-heading text-primary', featured ? 'text-4xl md:text-5xl' : 'text-3xl']}>
+              SAIMI {e.year}
+            </div>
+            <div class:list={['mt-2 font-medium dark:text-white', featured ? 'text-xl' : 'text-lg']}>
+              {e.date}
+            </div>
+            <div class="text-muted dark:text-slate-400">
+              {e.venue.includes(e.city) ? e.venue : `${e.venue}, ${e.city}`}
+            </div>
+            {e.note && <div class="mt-1 text-sm text-muted dark:text-slate-500">{e.note}</div>}
+            {e.url && (
+              <div class="mt-4 text-sm font-medium text-primary">
+                {new URL(e.url).host} &raquo;
+              </div>
+            )}
+          </Tag>
+        );
+      })
+    }
+  </div>
+  <slot />
+</WidgetWrapper>

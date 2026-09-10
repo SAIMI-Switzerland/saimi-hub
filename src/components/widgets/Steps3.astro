@@ -1,0 +1,54 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Timeline from '~/components/ui/Timeline.astro';
+import Headline from '~/components/ui/Headline.astro';
+import type { Steps as Props } from '~/types';
+
+const {
+  title = await Astro.slots.render('title'),
+  subtitle = await Astro.slots.render('subtitle'),
+  tagline = await Astro.slots.render('tagline'),
+  items = [],
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+---
+
+<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-5xl ${classes?.container ?? ''}`} bg={bg}>
+  <div class="flex flex-col gap-8 md:gap-12">
+    <!-- Headline above the columns -->
+    <div class="md:py-4 md:self-center w-full">
+      <Headline
+        title={title}
+        subtitle={subtitle}
+        tagline={tagline}
+        classes={{
+          container: 'text-left rtl:text-right',
+          title: 'text-3xl lg:text-4xl',
+          ...((classes?.headline as object) ?? {}),
+        }}
+      />
+
+      <!-- Steps in two columns with continuous lines -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <!-- Left column: steps 1,2,3 -->
+        {items.length > 0 && (
+          <Timeline
+            items={items.slice(0, 3)}
+            classes={classes?.items as Record<string, never>}
+          />
+        )}
+
+        <!-- Right column: steps 4,5 -->
+        {items.length > 3 && (
+          <Timeline
+            items={items.slice(3, 5)}
+            classes={classes?.items as Record<string, never>}
+          />
+        )}
+      </div>
+    </div>
+  </div>
+</WidgetWrapper>

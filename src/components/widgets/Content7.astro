@@ -1,0 +1,38 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+
+const {
+  title = await Astro.slots.render('title'),
+  sections = [],
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+---
+<WidgetWrapper
+  id={id}
+  isDark={isDark}
+  containerClass={`max-w-5xl mx-auto ${classes?.container ?? ''}`}
+  bg={bg}
+>
+  <Headline
+    title={title}
+    classes={{
+      container: 'text-center mb-12',
+      title: 'text-4xl md:text-5xl font-bold tracking-tighter font-heading',
+    }}
+  />
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-3xl mx-auto">
+    {sections.map((person, index) => (
+      <div
+        key={index}
+        class="bg-white dark:bg-slate-800 px-4 py-3 rounded-lg shadow-md text-center"
+      >
+        <span class="text-sm font-medium dark:text-white">{person.name}</span>
+      </div>
+    ))}
+  </div>
+</WidgetWrapper>

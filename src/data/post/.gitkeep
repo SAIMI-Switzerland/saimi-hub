@@ -1,0 +1,2 @@
+# Placeholder. The AstroWind blog is disabled (src/config.yaml -> apps.blog.isEnabled),
+# but its content collection still expects this directory to exist.

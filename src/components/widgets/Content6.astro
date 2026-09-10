@@ -1,0 +1,112 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import Image from '~/components/common/Image.astro';
+
+const {
+  title = await Astro.slots.render('title'),
+  sections = [],
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+const sizeMap = {
+  xl: { maxW: 'max-w-sm',      widths: [400], width: 400 },
+  lg: { maxW: 'max-w-xs',      widths: [300], width: 300 },
+  md: { maxW: 'max-w-[200px]', widths: [200], width: 200 },
+  sm: { maxW: 'max-w-[150px]', widths: [160], width: 160 },
+  xs: { maxW: 'max-w-[110px]', widths: [120], width: 120 },
+};
+---
+
+<WidgetWrapper
+  id={id}
+  isDark={isDark}
+  containerClass={`max-w-5xl mx-auto ${classes?.container ?? ''}`}
+  bg={bg}
+>
+  <Headline
+    title={title}
+    classes={{
+      container: 'text-center mb-12',
+      title: 'text-4xl md:text-5xl font-bold tracking-tighter font-heading',
+    }}
+  />
+  <div class="space-y-10 max-w-3xl mx-auto text-center">
+    {sections.map((section, index) => {
+      const { maxW, widths, width } = sizeMap[section.size ?? 'md'];
+      return (
+        <div key={index} class="md:text-center">
+          {section.subtitle && (
+            <h3 class="text-2xl font-semibold dark:text-white mb-2">
+              {section.subtitle}
+            </h3>
+          )}
+          {section.text && (
+            <p
+              class="text-lg text-muted dark:text-slate-400 mb-2"
+              set:html={section.text}
+            />
+          )}
+          {section.bullets && section.bullets.length > 0 && (
+            <div class="text-left inline-block mx-auto">
+              <ul class="list-disc list-inside text-lg text-muted dark:text-slate-400 space-y-1">
+                {section.bullets.map((bullet, i) => (
+                  <li key={i}>{bullet}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {section.images && section.images.length > 0 && (
+            <div class="flex flex-wrap justify-center items-center gap-6 mt-4">
+              {section.images.map((image, i) => {
+                // SVGs imported in Astro come through as functions with properties attached
+                const srcObj = (typeof image.src === 'function' || typeof image.src === 'object')
+                  ? image.src
+                  : null;
+                const naturalWidth = srcObj?.width ?? width;
+                const naturalHeight = srcObj?.height ?? width;
+                const displayHeight = srcObj
+                  ? Math.round((width / naturalWidth) * naturalHeight)
+                  : width;
+                const isSvg = srcObj?.format === 'svg';
+
+                return (
+                  <figure key={i} class={`flex flex-col items-center ${maxW}`} style={`width: ${width}px; max-width: 100%;`}>
+                    {isSvg ? (
+                      <img
+                        src={srcObj.src}
+                        alt={image.alt ?? ''}
+                        loading="lazy"
+                        decoding="async"
+                        style="width: 100%; height: auto; display: block;"
+                      />
+                    ) : (
+                      <Image
+                        class="w-full h-auto object-contain"
+                        widths={widths}
+                        sizes={`${width}px`}
+                        loading="lazy"
+                        width={width}
+                        height={displayHeight}
+                        src={image.src}
+                        alt={image.alt ?? ''}
+                      />
+                    )}
+                    {image.caption && (
+                      <figcaption class="mt-2 text-sm text-muted dark:text-slate-400">
+                        {image.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</WidgetWrapper>

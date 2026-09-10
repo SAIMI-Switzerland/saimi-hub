@@ -1,0 +1,145 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import Image from '~/components/common/Image.astro';
+import Button from '~/components/ui/Button.astro';
+
+const {
+  title = await Astro.slots.render('title'),
+  sections = [], // { id?, subtitle?, text?, bullets?, type?, people? }
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+// Slug helper (fallback only)
+const slugify = (str = '') =>
+  str
+    .toLowerCase()
+    .trim()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-');
+---
+<WidgetWrapper
+  id={id}
+  isDark={isDark}
+  containerClass={`max-w-5xl mx-auto ${classes?.container ?? ''}`}
+  bg={bg}
+>
+  <!-- Main Headline -->
+  <Headline
+    title={title}
+    classes={{
+      container: 'text-center mb-12',
+      title: 'text-4xl md:text-5xl font-bold tracking-tighter font-heading',
+    }}
+  />
+
+  <!-- Sections -->
+  <div class="space-y-10 max-w-3xl mx-auto text-center">
+    {sections.map((section) => {
+  const sectionId = section.id
+    ? `${id}-${section.id}`
+    : `${id}-${slugify(section.subtitle ?? 'section')}`;
+
+  return (
+    <div id={sectionId} class="scroll-mt-24">
+
+      {/* NORMAL TEXT SECTION */}
+      {section.type !== "people" && (
+        <div class="md:text-center">
+          {section.subtitle && (
+            <h3 class="text-2xl font-semibold dark:text-white mb-2">
+              {section.subtitle}
+            </h3>
+          )}
+
+          {section.text && (
+  <p
+    class="text-lg text-muted dark:text-slate-400 mb-2"
+    set:html={section.text}
+  />
+)}
+
+{/* CALL TO ACTION BUTTON */}
+{section.callToAction && (
+  <div class="mt-4">
+    <Button {...section.callToAction} />
+  </div>
+)}
+
+{section.bullets && section.bullets.length > 0 && (
+            <div class="text-left inline-block mx-auto">
+              <ul class="list-disc list-inside text-lg text-muted dark:text-slate-400 space-y-1">
+                {section.bullets.map((bullet, i) => (
+                  <li key={i}>{bullet}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PEOPLE SECTION (content4 style) */}
+      {section.type === "people" && (
+  <div
+    id={sectionId}
+    class="scroll-mt-24 md:text-center"
+  >
+    {/* Subtitle */}
+    {section.subtitle && (
+      <h3 class="text-2xl font-semibold dark:text-white mb-6">
+        {section.subtitle}
+      </h3>
+    )}
+
+    {/* People */}
+    <div class="space-y-8 max-w-3xl mx-auto">
+      {section.people.map((person, index) => (
+        <div
+          key={index}
+          class="flex items-center space-x-6 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md"
+        >
+          {person.image && (
+  <div class="w-40 h-40 flex-shrink-0">
+  {typeof person.image === 'string' ? (
+    <img
+      src={person.image}
+      alt={person.name}
+      class="w-40 h-40 rounded-full object-cover"
+    />
+  ) : (
+    <Image
+      class="w-40 h-40 rounded-full object-cover"
+      widths={[160, 240, 320, 480]}
+      sizes="(max-width: 767px) 160px, 160px"
+      loading="eager"
+      width={160}
+      height={160}
+      {...person.image}
+    />
+  )}
+</div>
+)}
+
+          <div class="text-left">
+            <h4 class="text-xl font-semibold dark:text-white">
+              {person.name}
+            </h4>
+            {person.role && (
+            <p class="text-gray-600 dark:text-slate-400 mt-2" set:html={person.role} />
+              )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+    </div>
+  );
+})}
+  </div>
+</WidgetWrapper>

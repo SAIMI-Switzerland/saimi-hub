@@ -1,0 +1,326 @@
+---
+// src/components/widgets/PhotoGallery.astro
+import { getImage } from 'astro:assets';
+import Image from '~/components/common/Image.astro';
+import type { GalleryPhoto } from '~/utils/gallery';
+
+interface Props {
+  photos: GalleryPhoto[];
+  title?: string;
+  subtitle?: string;
+}
+
+const {
+  photos = [],
+  title = 'Photo gallery',
+  subtitle = 'Click any photo to preview and download',
+} = Astro.props;
+
+// Pre-generate full-res URLs for the lightbox + download.
+// <Image> handles thumbnail rendering in the template below.
+const processed = await Promise.all(
+  photos.map(async (photo) => {
+    const full = await getImage({ src: photo.src, width: 1600, format: 'webp', quality: 88 });
+    return {
+      ...photo,
+      fullUrl: full.src,
+      src: undefined, // ImageMetadata can't be serialised into define:vars
+    };
+  })
+);
+
+const categories = ['All', ...new Set(photos.map((p) => p.category))].sort(
+  (a, b) => (a === 'All' ? -1 : b === 'All' ? 1 : a.localeCompare(b))
+);
+
+// Serialisable version passed to the client script via define:vars
+const clientPhotos = processed.map(({ id, title, category, filename, fullUrl }) => ({
+  id, title, category, filename, fullUrl,
+}));
+---
+
+<section class="gallery-section">
+  <div class="gallery-header">
+    <div>
+      <h2 class="gallery-title">{title}</h2>
+      {subtitle && <p class="gallery-subtitle">{subtitle}</p>}
+    </div>
+    <div class="filter-bar" role="group" aria-label="Filter by category">
+      {categories.map((cat) => (
+        <button
+          class={`filter-btn${cat === 'All' ? ' active' : ''}`}
+          data-category={cat}
+          type="button"
+        >
+          {cat}
+          <span class="filter-count">
+            ({cat === 'All' ? photos.length : photos.filter((p) => p.category === cat).length})
+          </span>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="gallery-grid" id="galleryGrid" role="list">
+    {photos.map((photo, i) => (
+      <div
+        class="photo-card"
+        data-category={photo.category}
+        data-index={i}
+        role="listitem"
+      >
+        <!-- AstroWind's Image component — handles resize, WebP, lazy loading -->
+        <Image
+          src={photo.src}
+          alt={photo.title}
+          width={400}
+          height={300}
+          widths={[400, 800]}
+          sizes="(max-width: 640px) 50vw, 25vw"
+          loading={i < 6 ? 'eager' : 'lazy'}
+          class="card-img"
+        />
+        <div class="photo-overlay">
+          <p class="photo-label">{photo.title}</p>
+          <div class="photo-actions">
+            <button
+              class="icon-btn"
+              aria-label={`Preview ${photo.title}`}
+              data-action="preview"
+              data-index={i}
+              type="button"
+            >
+              <!-- eye icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <a
+              class="icon-btn"
+              href={processed[i].fullUrl}
+              download={photo.filename}
+              aria-label={`Download ${photo.title}`}
+              data-action="download"
+              data-title={photo.title}
+            >
+              <!-- download icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+        <span class="category-badge">{photo.category}</span>
+      </div>
+    ))}
+  </div>
+
+  <p class="empty-state" id="galleryEmpty" hidden>No photos in this category.</p>
+</section>
+
+<!-- Lightbox -->
+<div class="lb-backdrop" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo preview" hidden>
+  <div class="lb-box">
+    <div class="lb-img-wrap">
+      <img id="lbImg" src="" alt="" />
+    </div>
+    <div class="lb-meta">
+      <div class="lb-info">
+        <p class="lb-name" id="lbName"></p>
+        <p class="lb-cat" id="lbCat"></p>
+      </div>
+      <div class="lb-actions">
+        <a class="lb-download" id="lbDownload" href="#" download>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </a>
+        <button class="lb-close" id="lbClose" aria-label="Close preview" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="lb-nav">
+      <button class="lb-nav-btn" id="lbPrev" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        Previous
+      </button>
+      <span class="lb-counter" id="lbCounter" aria-live="polite"></span>
+      <button class="lb-nav-btn" id="lbNext" type="button">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="gallery-toast" id="galleryToast" role="status" aria-live="polite">
+  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<style>
+  .gallery-section { width: 100%; padding: 2rem 0; font-family: var(--font-sans, system-ui, sans-serif); }
+  .gallery-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+  .gallery-title { font-size: 1.5rem; font-weight: 700; color: var(--aw-color-text-page, inherit); margin: 0 0 4px; line-height: 1.2; }
+  .gallery-subtitle { font-size: 0.9rem; color: var(--aw-color-text-muted, #6b7280); margin: 0; }
+
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filter-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; font-family: inherit; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--aw-color-border, #d1d5db); background: transparent; color: var(--aw-color-text-muted, #6b7280); cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { border-color: var(--aw-color-primary, #4f46e5); color: var(--aw-color-primary, #4f46e5); }
+  .filter-btn.active { background: var(--aw-color-primary, #4f46e5); border-color: var(--aw-color-primary, #4f46e5); color: #fff; }
+  .filter-count { font-size: 0.7rem; opacity: 0.75; }
+
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .photo-card { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 4/3; cursor: pointer; background: var(--aw-color-bg-page, #f3f4f6); border: 1px solid var(--aw-color-border, #e5e7eb); transition: transform 0.2s, box-shadow 0.2s; }
+  .photo-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .photo-card :global(.card-img) { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
+  .photo-card:hover :global(.card-img) { transform: scale(1.06); }
+  .photo-card[data-hidden] { display: none; }
+
+  .photo-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, transparent 55%); opacity: 0; transition: opacity 0.2s ease; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px; }
+  .photo-card:hover .photo-overlay, .photo-card:focus-within .photo-overlay { opacity: 1; }
+  .photo-label { font-size: 0.78rem; font-weight: 500; color: #fff; margin: 0 0 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .photo-actions { display: flex; gap: 6px; }
+  .icon-btn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s; text-decoration: none; backdrop-filter: blur(6px); }
+  .icon-btn:hover { background: rgba(255,255,255,0.32); }
+  .category-badge { position: absolute; top: 8px; right: 8px; font-size: 0.68rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--aw-color-primary, #4f46e5); color: #fff; pointer-events: none; }
+
+  .empty-state { text-align: center; padding: 3rem 0; color: var(--aw-color-text-muted, #9ca3af); font-size: 0.9rem; }
+
+  .lb-backdrop { position: fixed; inset: 0; background: rgba(10,10,25,0.88); z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+  .lb-backdrop[hidden] { display: none; }
+  .lb-box { background: var(--aw-color-bg-default, #fff); border-radius: 14px; border: 1px solid var(--aw-color-border, #e5e7eb); max-width: 720px; width: 100%; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+  .lb-img-wrap { background: #0f0f1a; aspect-ratio: 16/10; overflow: hidden; flex-shrink: 0; }
+  .lb-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .lb-meta { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--aw-color-border, #e5e7eb); }
+  .lb-info { flex: 1; min-width: 0; }
+  .lb-name { font-size: 0.95rem; font-weight: 600; margin: 0 0 2px; color: var(--aw-color-text-page, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lb-cat { font-size: 0.78rem; color: var(--aw-color-text-muted, #6b7280); margin: 0; }
+  .lb-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .lb-download { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; font-family: inherit; padding: 7px 16px; border-radius: 8px; background: var(--aw-color-primary, #4f46e5); color: #fff; border: none; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
+  .lb-download:hover { opacity: 0.88; }
+  .lb-close { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--aw-color-border, #e5e7eb); background: transparent; color: var(--aw-color-text-muted, #6b7280); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .lb-close:hover { background: var(--aw-color-bg-page, #f3f4f6); color: var(--aw-color-text-page, inherit); }
+  .lb-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 18px 14px; }
+  .lb-nav-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; font-family: inherit; color: var(--aw-color-text-muted, #6b7280); background: none; border: 1px solid var(--aw-color-border, #e5e7eb); border-radius: 8px; padding: 6px 12px; cursor: pointer; transition: all 0.15s; }
+  .lb-nav-btn:hover:not(:disabled) { border-color: var(--aw-color-primary, #4f46e5); color: var(--aw-color-primary, #4f46e5); }
+  .lb-nav-btn:disabled { opacity: 0.35; cursor: default; }
+  .lb-counter { font-size: 0.8rem; color: var(--aw-color-text-muted, #9ca3af); }
+
+  .gallery-toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: inline-flex; align-items: center; gap: 8px; background: var(--aw-color-bg-default, #fff); border: 1px solid var(--aw-color-border, #e5e7eb); border-radius: 10px; padding: 10px 16px; font-size: 0.82rem; color: var(--aw-color-text-page, inherit); box-shadow: 0 8px 24px rgba(0,0,0,0.1); opacity: 0; transform: translateY(8px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; }
+  .gallery-toast svg { color: #16a34a; flex-shrink: 0; }
+  .gallery-toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 640px) {
+    .gallery-header { flex-direction: column; }
+    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+    .lb-img-wrap { aspect-ratio: 4/3; }
+  }
+</style>
+
+<script define:vars={{ clientPhotos }}>
+  let activeFilter = 'All';
+  let filtered = [...clientPhotos];
+  let currentIdx = 0;
+
+  const grid    = document.getElementById('galleryGrid');
+  const empty   = document.getElementById('galleryEmpty');
+  const lb      = document.getElementById('lightbox');
+  const lbImg   = document.getElementById('lbImg');
+  const lbName  = document.getElementById('lbName');
+  const lbCat   = document.getElementById('lbCat');
+  const lbDl    = document.getElementById('lbDownload');
+  const lbClose = document.getElementById('lbClose');
+  const lbPrev  = document.getElementById('lbPrev');
+  const lbNext  = document.getElementById('lbNext');
+  const lbCtr   = document.getElementById('lbCounter');
+  const toast   = document.getElementById('galleryToast');
+  const toastMsg = document.getElementById('toastMsg');
+
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.category;
+      document.querySelectorAll('.filter-btn').forEach((b) =>
+        b.classList.toggle('active', b.dataset.category === activeFilter)
+      );
+      applyFilter();
+    });
+  });
+
+  function applyFilter() {
+    filtered = activeFilter === 'All'
+      ? [...clientPhotos]
+      : clientPhotos.filter((p) => p.category === activeFilter);
+
+    let visible = 0;
+    grid.querySelectorAll('.photo-card').forEach((card) => {
+      const show = activeFilter === 'All' || card.dataset.category === activeFilter;
+      card.toggleAttribute('data-hidden', !show);
+      if (show) visible++;
+    });
+    empty.hidden = visible > 0;
+  }
+
+  // Grid clicks
+  grid.addEventListener('click', (e) => {
+    const dlBtn = e.target.closest('[data-action="download"]');
+    const previewBtn = e.target.closest('[data-action="preview"]');
+    const card = e.target.closest('.photo-card');
+
+    if (dlBtn) {
+      showToast(`${dlBtn.dataset.title} download started`);
+      return;
+    }
+    if (previewBtn || card) {
+      const idx = parseInt((previewBtn || card).dataset.index, 10);
+      openLightbox(idx);
+    }
+  });
+
+  function openLightbox(globalIdx) {
+    const photo = clientPhotos[globalIdx];
+    const fi = filtered.findIndex((p) => p.id === photo.id);
+    currentIdx = fi >= 0 ? fi : 0;
+    updateLightbox();
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    lbClose.focus();
+  }
+
+  function closeLightbox() {
+    lb.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function updateLightbox() {
+    const photo = filtered[currentIdx];
+    lbImg.src = photo.fullUrl;
+    lbImg.alt = photo.title;
+    lbName.textContent = photo.title;
+    lbCat.textContent = photo.category;
+    lbDl.href = photo.fullUrl;
+    lbDl.download = photo.filename;
+    lbCtr.textContent = `${currentIdx + 1} of ${filtered.length}`;
+    lbPrev.disabled = currentIdx === 0;
+    lbNext.disabled = currentIdx === filtered.length - 1;
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+  lbPrev.addEventListener('click', () => { if (currentIdx > 0) { currentIdx--; updateLightbox(); } });
+  lbNext.addEventListener('click', () => { if (currentIdx < filtered.length - 1) { currentIdx++; updateLightbox(); } });
+  lbDl.addEventListener('click', () => showToast(`${filtered[currentIdx].title} download started`));
+
+  document.addEventListener('keydown', (e) => {
+    if (lb.hidden) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lbPrev.click();
+    if (e.key === 'ArrowRight') lbNext.click();
+  });
+
+  let toastTimer;
+  function showToast(msg) {
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+</script>

@@ -1,0 +1,21 @@
+---
+import { SITE } from 'astrowind:config';
+import Image from '~/components/common/Image.astro';
+
+// Use a string path if findImage is configured to look in ~/assets
+const logoSrc = '~/assets/images/logo.png'; 
+---
+
+<div class="flex items-center">
+  <Image
+    src={logoSrc}
+    alt={SITE?.name || 'Logo'}
+    aspectRatio = {942/752}
+    width = {40}
+    layout="fixed"
+  />
+  
+  <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+    {SITE.name}
+  </span>
+</div>

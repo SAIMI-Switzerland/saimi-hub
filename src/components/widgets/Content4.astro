@@ -1,0 +1,71 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import Image from '~/components/common/Image.astro';
+
+const {
+  title = await Astro.slots.render('title'), 
+  sections = [], // Array of { name, role?, image? }
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+---
+
+<WidgetWrapper
+  id={id}
+  isDark={isDark}
+  containerClass={`max-w-5xl mx-auto ${classes?.container ?? ''}`}
+  bg={bg}
+>
+  <!-- Main Headline -->
+  <Headline
+    title={title}
+    classes={{
+      container: 'text-center mb-12',
+      title: 'text-4xl md:text-5xl font-bold tracking-tighter font-heading',
+    }}
+  />
+
+  <!-- Organisers -->
+  <div class="space-y-8 max-w-3xl mx-auto">
+    {sections.map((person, index) => (
+      <div 
+        key={index} 
+        class="flex items-center space-x-6 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md"
+      >
+        {/* Image */}
+        {person.image && (
+          <div class="w-24 h-24 flex-shrink-0">
+            {typeof person.image === 'string' ? (
+              <img
+                src={person.image}
+                alt={person.name}
+                class="w-24 h-24 rounded-full object-cover"
+              />
+            ) : (
+              <Image
+                class="w-24 h-24 rounded-full object-cover"
+                widths={[96, 128, 192, 256]} 
+                sizes="(max-width: 767px) 96px, (max-width: 1023px) 128px, 192px"
+                loading="eager"
+                width={96}
+                height={96}
+                {...person.image}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Name & Role */}
+        <div>
+          <h3 class="text-xl font-semibold dark:text-white">{person.name}</h3>
+          {person.role && (
+            <p class="text-gray-600 dark:text-slate-400">{person.role}</p>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</WidgetWrapper>
