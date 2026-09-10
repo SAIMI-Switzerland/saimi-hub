@@ -59,4 +59,4 @@ so no content is ever unreachable.**
    (`public/CNAME` is already in place.)
 3. DNS — apex domain, so `A`/`AAAA` records rather than a `CNAME`.
 
-See `DEPLOYMENT.md` at the top of the `websites` folder for the full sequence.
+See `DEPLOYMENT.md` in the parent `SAIMI` folder for the full sequence.
