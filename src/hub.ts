@@ -54,9 +54,12 @@ export const hub = {
     },
   ] as Edition[],
 
-  /** Call for hosts. Set `open: false` once a host is confirmed. */
+  /**
+   * Call for hosts. `open: false` hides the section and its menu item while
+   * keeping the text ready for when you want to run the call.
+   */
   callForHosts: {
-    open: true,
+    open: false,
     /** The edition being sought. */
     year: 2028,
     text:
