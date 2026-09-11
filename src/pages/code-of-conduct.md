@@ -3,14 +3,8 @@ title: 'Code of Conduct'
 layout: '~/layouts/MarkdownLayout.astro'
 ---
 
-SAIMI is endorsed by the MICCAI Society and follows the
-[MICCAI Society Code of Conduct](https://miccai.org/about-miccai/policies/code-of-conduct-policy/),
-adapted below for a one day regional symposium. The standards of behaviour are
-the Society's. What differs is who you report to and who decides, because a
-SAIMI incident is handled by SAIMI, not by the MICCAI Board.
-
-Two sections have no equivalent in the Society's policy and exist because of how
-SAIMI works: the treatment of unpublished work, and event photography.
+SAIMI is endorsed by the MICCAI Society and SAIMI's code of conduct is based on the
+[MICCAI Society Code of Conduct](https://miccai.org/about-miccai/policies/code-of-conduct-policy/) lightly adapted to better reflect a regional one day event with non-archival submissions. 
 
 ## Who and what this covers
 
@@ -19,8 +13,8 @@ speakers, poster presenters, organisers, volunteers, reviewers, sponsors,
 exhibitors, vendors, guests and venue staff.
 
 It covers the symposium day itself, including poster sessions and sponsor
-booths; associated social events such as the apéro and the speakers' dinner; any
-online or hybrid sessions; and SAIMI's communication channels, including social
+booths, associated social events such as the apéro and the speakers' dinner, any
+online or hybrid sessions, and SAIMI's communication channels, including social
 media.
 
 ## Expected behaviour
@@ -66,8 +60,7 @@ takes part in handling one.
 SAIMI is non archival and explicitly invites work in progress. Everything
 presented is shared in confidence.
 
-Do not photograph posters or slides, circulate them, or post their content
-online without the presenting author's permission. Do not use results you saw at
+Do not circulate content of posters and slides online without the presenting author's permission. Do not use results you saw at
 SAIMI in your own work without asking. If you want a copy of something, ask the
 author.
 
@@ -83,16 +76,15 @@ refusal without discussion.
 
 ## Reporting a concern
 
-Two routes, and you may use either:
+Two reporting routes are available: 
 
 - **A code of conduct officer.** Each edition names two, at least one of whom is
   not part of the local organising team. They are listed on the edition website
-  and in the programme booklet, and are reachable on the day.
-- **The steering committee**, at TODO@saimi.ch. Use this route if the concern
-  involves an organiser, or if you would rather raise it outside the host
+  and in the programme booklet, and are reachable on the day. 
+- **The steering committee**, at steering-commitee@saimi.ch. Use this route if the concern involves an organiser, or if you would rather raise it outside the host
   institution.
 
-If you are in immediate danger, contact venue security or the emergency services
+If you are in immediate danger, contact venue security (if present) or the emergency services
 first, then tell an organiser.
 
 You can report during the event or afterwards. You can report an incident that
@@ -131,7 +123,7 @@ include a private warning, a request to change specific behaviour, a requirement
 to leave a session or the event, withdrawal of an accepted abstract or of an
 award, and exclusion from future SAIMI editions.
 
-Attendance is free, so there is nothing to refund, but SAIMI does not reimburse
+SAIMI does not reimburse
 travel or accommodation for anyone asked to leave.
 
 Where conduct may be criminal, SAIMI will cooperate with law enforcement.
