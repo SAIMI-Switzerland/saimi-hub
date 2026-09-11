@@ -1,12 +1,12 @@
 // src/utils/gallery.ts
-// Returns raw ImageMetadata objects — AstroWind's <Image> component
+// Returns raw ImageMetadata objects, AstroWind's <Image> component
 // handles all optimisation (resize, WebP conversion, hashing) internally.
 
 export interface GalleryPhoto {
   id: number;
   title: string;
   category: string;
-  src: ImageMetadata;   // raw Astro ImageMetadata — passed straight to <Image>
+  src: ImageMetadata;   // raw Astro ImageMetadata, passed straight to <Image>
   filename: string;
 }
 

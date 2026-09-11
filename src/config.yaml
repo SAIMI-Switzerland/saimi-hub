@@ -10,8 +10,8 @@ site:
 metadata:
   title:
     default: SAIMI
-    template: '%s — SAIMI'
-  description: "SAIMI — the Symposium on Artificial Intelligence in Medical Imaging: a one-day meeting for the Swiss medical image analysis community, endorsed by MICCAI."
+    template: '%s | SAIMI'
+  description: "SAIMI, the Symposium on Artificial Intelligence in Medical Imaging: a one-day meeting for the Swiss medical image analysis community, endorsed by MICCAI."
   robots:
     index: true
     follow: true

@@ -3,10 +3,10 @@ import { hub } from './hub';
 
 const editionLinks = [
   ...(hub.upcoming
-    ? [{ text: `SAIMI ${hub.upcoming.year} — ${hub.upcoming.city}`, href: hub.upcoming.url ?? getPermalink('/#upcoming') }]
+    ? [{ text: `SAIMI ${hub.upcoming.year}, ${hub.upcoming.city}`, href: hub.upcoming.url ?? getPermalink('/#upcoming') }]
     : []),
   ...hub.past.map((e) => ({
-    text: `SAIMI ${e.year} — ${e.city}`,
+    text: `SAIMI ${e.year}, ${e.city}`,
     href: e.url ?? getPermalink('/#past'),
   })),
 ];
@@ -25,7 +25,7 @@ export const headerData = {
 export const footerData = {
   socialLinks: [{ ariaLabel: 'LinkedIn', icon: 'tabler:brand-linkedin', href: hub.linkedin }],
   footNote: `
-    SAIMI — Symposium on Artificial Intelligence in Medical Imaging · Endorsed by the MICCAI Society<br />
+    SAIMI: Symposium on Artificial Intelligence in Medical Imaging · Endorsed by the MICCAI Society<br />
     Maintained by the SAIMI steering committee. Based on the AstroWind template.
   `,
 };

@@ -1,5 +1,5 @@
 /* =============================================================================
- * SAIMI hub configuration — saimi.ch
+ * SAIMI hub configuration for saimi.ch
  * =============================================================================
  *
  * The hub is permanent and maintained by the steering committee. It is the one
