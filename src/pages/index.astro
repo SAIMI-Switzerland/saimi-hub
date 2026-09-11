@@ -33,7 +33,7 @@ const heroActions = [
 ];
 
 const contactText = hub.contactEmail
-  ? hub.contactEmail
+  ? `<a href="mailto:${hub.contactEmail}" class="text-primary underline">${hub.contactEmail}</a>`
   : 'A general contact address for SAIMI is being set up. In the meantime, please reach out to a member of the steering committee, or via LinkedIn.';
 ---
 

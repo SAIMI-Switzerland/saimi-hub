@@ -33,9 +33,9 @@ the hub carries no public call for hosts.
 **Other things you may need to change:**
 
 - `steeringCommittee`, portraits go in `src/assets/images/`, referenced by path.
-- `contactEmail`, currently `null`, which makes the contact section fall back to a
-  "being set up" message. **TODO:** set this to a role address such as `info@saimi.ch`
-  once one exists, so the contact point survives changes in the teams.
+- `contactEmail`, the role address shown in the contact section. Currently
+  `info@saimi.ch`. Keeping this a role address rather than a personal one is what
+  lets the contact point survive changes in the teams.
 - `src/pages/code-of-conduct.md`, the code of conduct, as a standalone page.
 
 ## Development

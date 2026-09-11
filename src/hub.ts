@@ -71,11 +71,8 @@ export const hub = {
     { name: 'Mauricio Reyes', role: 'University of Bern, Switzerland', image: '~/assets/images/mauricio.jpg' },
   ] as Person[],
 
-  /**
-   * TODO: replace with a role address (e.g. info@saimi.ch) once it exists, so
-   * the contact point survives changes in the organising teams.
-   */
-  contactEmail: null as string | null,
+  /** Role address, so the contact point survives changes in the teams. */
+  contactEmail: 'info@saimi.ch' as string | null,
 
   linkedin:
     'https://www.linkedin.com/company/symposium-on-artificial-intelligence-in-medical-imaging',
